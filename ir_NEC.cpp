@@ -59,7 +59,7 @@ bool  IRrecv::decodeNEC (decode_results *results)
 	offset++;
 
 	// Check for repeat
-	if ( (irparams.rawlen == 4)
+	if ( (pirparams->rawlen == 4)
 	    && MATCH_SPACE(results->rawbuf[offset  ], NEC_RPT_SPACE)
 	    && MATCH_MARK (results->rawbuf[offset+1], NEC_BIT_MARK )
 	   ) {
@@ -70,7 +70,7 @@ bool  IRrecv::decodeNEC (decode_results *results)
 	}
 
 	// Check we have enough data
-	if (irparams.rawlen < (2 * NEC_BITS) + 4)  return false ;
+	if (pirparams->rawlen < (2 * NEC_BITS) + 4)  return false ;
 
 	// Check header "space"
 	if (!MATCH_SPACE(results->rawbuf[offset], NEC_HDR_SPACE))  return false ;

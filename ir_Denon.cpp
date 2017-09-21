@@ -66,7 +66,7 @@ bool  IRrecv::decodeDenon (decode_results *results)
 	int            offset = 1;  // Skip the Gap reading
 
 	// Check we have the right amount of data
-	if (irparams.rawlen != 1 + 2 + (2 * BITS) + 1)  return false ;
+	if (pirparams->rawlen != 1 + 2 + (2 * BITS) + 1)  return false ;
 
 	// Check initial Mark+Space match
 	if (!MATCH_MARK (results->rawbuf[offset++], HDR_MARK ))  return false ;

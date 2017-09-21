@@ -59,7 +59,7 @@ bool  IRrecv::decodeSAMSUNG (decode_results *results)
 	offset++;
 
 	// Check for repeat
-	if (    (irparams.rawlen == 4)
+	if (    (pirparams->rawlen == 4)
 	     && MATCH_SPACE(results->rawbuf[offset], SAMSUNG_RPT_SPACE)
 	     && MATCH_MARK(results->rawbuf[offset+1], SAMSUNG_BIT_MARK)
 	   ) {
@@ -68,7 +68,7 @@ bool  IRrecv::decodeSAMSUNG (decode_results *results)
 		results->decode_type = SAMSUNG;
 		return true;
 	}
-	if (irparams.rawlen < (2 * SAMSUNG_BITS) + 4)  return false ;
+	if (pirparams->rawlen < (2 * SAMSUNG_BITS) + 4)  return false ;
 
 	// Initial space
 	if (!MATCH_SPACE(results->rawbuf[offset++], SAMSUNG_HDR_SPACE))  return false ;

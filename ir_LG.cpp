@@ -26,7 +26,7 @@ bool  IRrecv::decodeLG (decode_results *results)
     int   offset = 1; // Skip first space
 
 	// Check we have the right amount of data
-    if (irparams.rawlen < (2 * LG_BITS) + 1 )  return false ;
+    if (irparams->rawlen < (2 * LG_BITS) + 1 )  return false ;
 
     // Initial mark/space
     if (!MATCH_MARK(results->rawbuf[offset++], LG_HDR_MARK))  return false ;

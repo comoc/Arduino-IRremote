@@ -83,35 +83,42 @@ public:
   }
   // Copies the dummy buf into the interrupt buf
   void useDummyBuf() {
-    int last = SPACE;
-    irparams.rcvstate = STATE_STOP;
-    irparams.rawlen = 1; // Skip the gap
-    for (int i = 0 ; i < sendlogcnt; i++) {
-      if (sendlog[i] < 0) {
-        if (last == MARK) {
-          // New space
-          irparams.rawbuf[irparams.rawlen++] = (-sendlog[i] - MARK_EXCESS) / USECPERTICK;
-          last = SPACE;
-        } 
-        else {
-          // More space
-          irparams.rawbuf[irparams.rawlen - 1] += -sendlog[i] / USECPERTICK;
+    for (int i = 0; i < IR_PARAMS_NUM; i++) {
+
+      irparams_t* pirparams = &irparams[i];
+      if (pirparams->isAactive == 0)
+        continue;
+
+      int last = SPACE;
+      pirparams->rcvstate = STATE_STOP;
+      pirparams->rawlen = 1; // Skip the gap
+      for (int i = 0 ; i < sendlogcnt; i++) {
+        if (sendlog[i] < 0) {
+          if (last == MARK) {
+            // New space
+            pirparams->rawbuf[pirparams->rawlen++] = (-sendlog[i] - MARK_EXCESS) / USECPERTICK;
+            last = SPACE;
+          }
+          else {
+            // More space
+            pirparams->rawbuf[pirparams->rawlen - 1] += -sendlog[i] / USECPERTICK;
+          }
         }
-      } 
-      else if (sendlog[i] > 0) {
-        if (last == SPACE) {
-          // New mark
-          irparams.rawbuf[irparams.rawlen++] = (sendlog[i] + MARK_EXCESS) / USECPERTICK;
-          last = MARK;
-        } 
-        else {
-          // More mark
-          irparams.rawbuf[irparams.rawlen - 1] += sendlog[i] / USECPERTICK;
+        else if (sendlog[i] > 0) {
+          if (last == SPACE) {
+            // New mark
+            pirparams->rawbuf[pirparams->rawlen++] = (sendlog[i] + MARK_EXCESS) / USECPERTICK;
+            last = MARK;
+          }
+          else {
+            // More mark
+            pirparams->rawbuf[pirparams->rawlen - 1] += sendlog[i] / USECPERTICK;
+          }
         }
       }
-    }
-    if (irparams.rawlen % 2) {
-      irparams.rawlen--; // Remove trailing space
+      if (pirparams->rawlen % 2) {
+        pirparams->rawlen--; // Remove trailing space
+      }
     }
   }
 };

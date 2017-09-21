@@ -89,14 +89,14 @@ bool  IRrecv::decodeRC5 (decode_results *results)
 	int   used   = 0;
 	int   offset = 1;  // Skip gap space
 
-	if (irparams.rawlen < MIN_RC5_SAMPLES + 2)  return false ;
+	if (pirparams->rawlen < MIN_RC5_SAMPLES + 2)  return false ;
 
 	// Get start bits
 	if (getRClevel(results, &offset, &used, RC5_T1) != MARK)   return false ;
 	if (getRClevel(results, &offset, &used, RC5_T1) != SPACE)  return false ;
 	if (getRClevel(results, &offset, &used, RC5_T1) != MARK)   return false ;
 
-	for (nbits = 0;  offset < irparams.rawlen;  nbits++) {
+	for (nbits = 0;  offset < pirparams->rawlen;  nbits++) {
 		int  levelA = getRClevel(results, &offset, &used, RC5_T1);
 		int  levelB = getRClevel(results, &offset, &used, RC5_T1);
 

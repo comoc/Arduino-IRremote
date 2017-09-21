@@ -27,7 +27,7 @@ bool  IRrecv::decodeSanyo (decode_results *results)
 	long  data   = 0;
 	int   offset = 0;  // Skip first space  <-- CHECK THIS!
 
-	if (irparams.rawlen < (2 * SANYO_BITS) + 2)  return false ;
+	if (pirparams->rawlen < (2 * SANYO_BITS) + 2)  return false ;
 
 #if 0
 	// Put this back in for debugging - note can't use #DEBUG as if Debug on we don't see the repeat cos of the delay
@@ -53,7 +53,7 @@ bool  IRrecv::decodeSanyo (decode_results *results)
 	// Skip Second Mark
 	if (!MATCH_MARK(results->rawbuf[offset++], SANYO_HDR_MARK))  return false ;
 
-	while (offset + 1 < irparams.rawlen) {
+	while (offset + 1 < pirparams->rawlen) {
 		if (!MATCH_SPACE(results->rawbuf[offset++], SANYO_HDR_SPACE))  break ;
 
 		if      (MATCH_MARK(results->rawbuf[offset], SANYO_ONE_MARK))   data = (data << 1) | 1 ;

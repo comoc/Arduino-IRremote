@@ -60,9 +60,9 @@ bool  IRrecv::decodeJVC (decode_results *results)
 	int   offset = 1; // Skip first space
 
 	// Check for repeat
-	if (  (irparams.rawlen - 1 == 33)
+	if (  (pirparams->rawlen - 1 == 33)
 	    && MATCH_MARK(results->rawbuf[offset], JVC_BIT_MARK)
-	    && MATCH_MARK(results->rawbuf[irparams.rawlen-1], JVC_BIT_MARK)
+	    && MATCH_MARK(results->rawbuf[pirparams->rawlen-1], JVC_BIT_MARK)
 	   ) {
 		results->bits        = 0;
 		results->value       = REPEAT;
@@ -73,7 +73,7 @@ bool  IRrecv::decodeJVC (decode_results *results)
 	// Initial mark
 	if (!MATCH_MARK(results->rawbuf[offset++], JVC_HDR_MARK))  return false ;
 
-	if (irparams.rawlen < (2 * JVC_BITS) + 1 )  return false ;
+	if (pirparams->rawlen < (2 * JVC_BITS) + 1 )  return false ;
 
 	// Initial space
 	if (!MATCH_SPACE(results->rawbuf[offset++], JVC_HDR_SPACE))  return false ;

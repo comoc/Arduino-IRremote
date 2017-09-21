@@ -50,7 +50,7 @@ bool  IRrecv::decodeSony (decode_results *results)
 	long  data   = 0;
 	int   offset = 0;  // Dont skip first space, check its size
 
-	if (irparams.rawlen < (2 * SONY_BITS) + 2)  return false ;
+	if (pirparams->rawlen < (2 * SONY_BITS) + 2)  return false ;
 
 	// Some Sony's deliver repeats fast after first
 	// unfortunately can't spot difference from of repeat from two fast clicks
@@ -72,7 +72,7 @@ bool  IRrecv::decodeSony (decode_results *results)
 	// Initial mark
 	if (!MATCH_MARK(results->rawbuf[offset++], SONY_HDR_MARK))  return false ;
 
-	while (offset + 1 < irparams.rawlen) {
+	while (offset + 1 < pirparams->rawlen) {
 		if (!MATCH_SPACE(results->rawbuf[offset++], SONY_HDR_SPACE))  break ;
 
 		if      (MATCH_MARK(results->rawbuf[offset], SONY_ONE_MARK))   data = (data << 1) | 1 ;

@@ -53,6 +53,7 @@ typedef
 		unsigned int  timer;           // State timer, counts 50uS ticks.
 		unsigned int  rawbuf[RAWBUF];  // raw data
 		uint8_t       overflow;        // Raw buffer overflow occurred
+		uint8_t       isAactive;     // Extended by Komori. If this parameter is active, this value is 1, otherwise 0
 	}
 irparams_t;
 
@@ -66,7 +67,8 @@ irparams_t;
 // Allow all parts of the code access to the ISR data
 // NB. The data can be changed by the ISR at any time, even mid-function
 // Therefore we declare it as "volatile" to stop the compiler/CPU caching it
-EXTERN  volatile irparams_t  irparams;
+#define IR_PARAMS_NUM 40
+EXTERN  volatile irparams_t  irparams[IR_PARAMS_NUM];
 
 //------------------------------------------------------------------------------
 // Defines for setting and clearing register bits

@@ -28,7 +28,7 @@ bool  IRrecv::decodeMitsubishi (decode_results *results)
 {
   // Serial.print("?!? decoding Mitsubishi:");Serial.print(irparams.rawlen); Serial.print(" want "); Serial.println( 2 * MITSUBISHI_BITS + 2);
   long data = 0;
-  if (irparams.rawlen < 2 * MITSUBISHI_BITS + 2)  return false ;
+  if (pirparams->rawlen < 2 * MITSUBISHI_BITS + 2)  return false ;
   int offset = 0; // Skip first space
   // Initial space
 
@@ -60,7 +60,7 @@ bool  IRrecv::decodeMitsubishi (decode_results *results)
   if (!MATCH_MARK(results->rawbuf[offset], MITSUBISHI_HDR_SPACE))  return false ;
   offset++;
 
-  while (offset + 1 < irparams.rawlen) {
+  while (offset + 1 < pirparams->rawlen) {
     if      (MATCH_MARK(results->rawbuf[offset], MITSUBISHI_ONE_MARK))   data = (data << 1) | 1 ;
     else if (MATCH_MARK(results->rawbuf[offset], MITSUBISHI_ZERO_MARK))  data <<= 1 ;
     else                                                                 return false ;

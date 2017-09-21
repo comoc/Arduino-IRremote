@@ -2,9 +2,18 @@
 #include "IRremoteInt.h"
 
 #ifdef IR_TIMER_USE_ESP32
-hw_timer_t *timer;
+hw_timer_t *timer = NULL;
 void IRTimer(); // defined in IRremote.cpp
 #endif
+
+class IRParamsInitializer {
+public:
+	IRParamsInitializer() {
+		memset((void*)irparams, 0, sizeof(irparams_t) * IR_PARAMS_NUM);
+	}
+};
+
+IRParamsInitializer _irparamsInitializeInstance;
 
 //+=============================================================================
 // Decodes the received IR message
@@ -13,12 +22,15 @@ void IRTimer(); // defined in IRremote.cpp
 //
 int  IRrecv::decode (decode_results *results)
 {
-	results->rawbuf   = irparams.rawbuf;
-	results->rawlen   = irparams.rawlen;
+	if (pirparams->isAactive == 0)
+		return false;
 
-	results->overflow = irparams.overflow;
+	results->rawbuf   = pirparams->rawbuf;
+	results->rawlen   = pirparams->rawlen;
 
-	if (irparams.rcvstate != STATE_STOP)  return false ;
+	results->overflow = pirparams->overflow;
+
+	if (pirparams->rcvstate != STATE_STOP)  return false ;
 
 #if DECODE_NEC
 	DBG_PRINTLN("Attempting NEC decode");
@@ -102,17 +114,23 @@ int  IRrecv::decode (decode_results *results)
 
 //+=============================================================================
 IRrecv::IRrecv (int recvpin)
+	: recvpin(recvpin)
 {
-	irparams.recvpin = recvpin;
-	irparams.blinkflag = 0;
+	pirparams = &irparams[recvpin];
+	pirparams->isAactive = 1;
+	pirparams->recvpin = recvpin;
+	pirparams->blinkflag = 0;
 }
 
 IRrecv::IRrecv (int recvpin, int blinkpin)
+	: recvpin(recvpin)
 {
-	irparams.recvpin = recvpin;
-	irparams.blinkpin = blinkpin;
+	pirparams = &irparams[recvpin];
+	pirparams->isAactive = 1;
+	pirparams->recvpin = recvpin;
+	pirparams->blinkpin = blinkpin;
 	pinMode(blinkpin, OUTPUT);
-	irparams.blinkflag = 0;
+	pirparams->blinkflag = 0;
 }
 
 
@@ -127,11 +145,13 @@ void  IRrecv::enableIRIn ( )
 	// ESP32 has a proper API to setup timers, no weird chip macros needed
 	// simply call the readable API versions :)
 	// 3 timers, choose #1, 80 divider nanosecond precision, 1 to count up
-	timer = timerBegin(1, 80, 1);
-	timerAttachInterrupt(timer, &IRTimer, 1);
-	// every 50ns, autoreload = true
-	timerAlarmWrite(timer, 50, true);
-	timerAlarmEnable(timer);
+	if (timer == NULL) {
+		timer = timerBegin(1, 80, 1);
+		timerAttachInterrupt(timer, &IRTimer, 1);
+		// every 50ns, autoreload = true
+		timerAlarmWrite(timer, 50, true);
+		timerAlarmEnable(timer);
+	}
 #else
 	cli();
 	// Setup pulse clock timer interrupt
@@ -149,11 +169,13 @@ void  IRrecv::enableIRIn ( )
 #endif
 
 	// Initialize state machine variables
-	irparams.rcvstate = STATE_IDLE;
-	irparams.rawlen = 0;
+	pirparams->rcvstate = STATE_IDLE;
+	pirparams->rawlen = 0;
 
 	// Set pin modes
-	pinMode(irparams.recvpin, INPUT);
+	pinMode(pirparams->recvpin, INPUT);
+	Serial.print("recvpin: ");
+	Serial.println(pirparams->recvpin);
 }
 
 //+=============================================================================
@@ -161,7 +183,7 @@ void  IRrecv::enableIRIn ( )
 //
 void  IRrecv::blink13 (int blinkflag)
 {
-	irparams.blinkflag = blinkflag;
+	pirparams->blinkflag = blinkflag;
 	if (blinkflag)  pinMode(BLINKLED, OUTPUT) ;
 }
 
@@ -170,15 +192,15 @@ void  IRrecv::blink13 (int blinkflag)
 //
 bool  IRrecv::isIdle ( )
 {
- return (irparams.rcvstate == STATE_IDLE || irparams.rcvstate == STATE_STOP) ? true : false;
+ return (pirparams->rcvstate == STATE_IDLE || pirparams->rcvstate == STATE_STOP) ? true : false;
 }
 //+=============================================================================
 // Restart the ISR state machine
 //
 void  IRrecv::resume ( )
 {
-	irparams.rcvstate = STATE_IDLE;
-	irparams.rawlen = 0;
+	pirparams->rcvstate = STATE_IDLE;
+	pirparams->rawlen = 0;
 }
 
 //+=============================================================================

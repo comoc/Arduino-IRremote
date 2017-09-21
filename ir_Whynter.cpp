@@ -58,7 +58,7 @@ bool  IRrecv::decodeWhynter (decode_results *results)
 	int   offset = 1;  // skip initial space
 
 	// Check we have the right amount of data
-	if (irparams.rawlen < (2 * WHYNTER_BITS) + 6)  return false ;
+	if (pirparams->rawlen < (2 * WHYNTER_BITS) + 6)  return false ;
 
 	// Sequence begins with a bit mark and a zero space
 	if (!MATCH_MARK (results->rawbuf[offset++], WHYNTER_BIT_MARK  ))  return false ;

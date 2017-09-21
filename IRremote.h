@@ -158,6 +158,7 @@ class decode_results
 		volatile unsigned int  *rawbuf;      // Raw intervals in 50uS ticks
 		int                    rawlen;       // Number of records in rawbuf
 		int                    overflow;     // true iff IR raw code too long
+		decode_results(): decode_type(UNUSED), address(0), value(0), bits(0), rawbuf(0), rawlen(0), overflow(0) {}
 };
 
 //------------------------------------------------------------------------------
@@ -181,6 +182,9 @@ class IRrecv
 		void  resume     ( ) ;
 
 	private:
+        int   recvpin;
+        volatile irparams_t* pirparams;
+
 		long  decodeHash (decode_results *results) ;
 		int   compare    (unsigned int oldval, unsigned int newval) ;
 
